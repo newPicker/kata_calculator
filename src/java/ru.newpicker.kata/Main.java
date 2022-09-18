@@ -8,36 +8,24 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         String input = getString();
+        isCorrectData(input);
         String[] arr = input.split(" ");
 
-        isCorrectData(arr);
-        boolean usedRomanNumbers;
-        boolean usedArabicNumbers;
+        int systemOfOperand1 = systemOfOperand(arr[0]); // 0 - некорректные данные, 1 - араб, 2 - рим
+        int systemOfOperand2 = systemOfOperand(arr[2]); // 0 - некорректные данные, 1 - араб, 2 - рим
 
-        try {
-            usedRomanNumbers = isRomanNumbers(arr);
-        }
-        catch (IllegalArgumentException ex){
-            usedRomanNumbers = false;
-        }
-
-        try {
-            usedArabicNumbers = isArabicNumbers(arr);
-        } catch (NumberFormatException ex){
-            usedArabicNumbers = false;
-        }
-
-        if (usedArabicNumbers && usedRomanNumbers) {
-            throw new IOException("ОШИБКА! т.к. используются одновременно разные системы счисления");
-        } else if (usedArabicNumbers) {
-            calculatorArabic(arr);
-        } else if (usedRomanNumbers) {
+        if(systemOfOperand1 == 2 && systemOfOperand2 == 2) {
+            isValidRomanNumbers(arr);
             calculatorRoman(arr);
+        } else if (systemOfOperand1 == 1 && systemOfOperand2 == 1) {
+            isValidArabicNumbers(arr);
+            calculatorArabic(arr);
         } else {
-            throw new IOException("ОШИБКА! т.к. Введены некорректные данные");
+            throw new IOException("ОШИБКА! т.к. используются одновременно разные системы счисления");
         }
-
 }
+
+
 
     private static String getString() {
         // Получаем выраженние, которое нужно посчитать
@@ -49,8 +37,10 @@ public class Main {
         return scanner.nextLine();
     }
 
-    private static void isCorrectData(String[] arr) throws IOException {
+    private static void isCorrectData(String input) throws IOException {
         // Проверяем формат введенного выражения
+
+        String[] arr = input.split(" ");
 
         if (arr.length > 3) {
             throw new IOException("ОШИБКА! формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
@@ -58,54 +48,76 @@ public class Main {
             throw new IOException("ОШИБКА! т.к. строка не является математической операцией");
         }
     }
+
+    private static int systemOfOperand(String s) throws IOException {
+        // Проверяем, какая система счисления у операнда
+
+        int operandSystemArabic = 0;
+        int operandSystemRoman = 0;
+
+        try {
+            Integer.parseInt(s);
+            operandSystemArabic = 1;
+
+        } catch (NumberFormatException ex) {}
+
+        if(operandSystemArabic != 1){
+            for (int i = 0; i < s.length(); i++) {
+                for ( RomanNumber rn: RomanNumber.values()) {
+                    String symbol = String.valueOf(s.charAt(i));
+                    if ( symbol.equals( rn.toString() ) ) {
+                        operandSystemRoman = 1;
+                        break;
+                    } else {
+                        operandSystemRoman = 0;
+                    }
+                }
+            }
+        }
+
+        if (operandSystemArabic != 1 && operandSystemRoman != 1) {
+            throw new IOException("ОШИБКА! т.к. Введены некорректные данные");
+        } else if (operandSystemArabic == 1) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
     
-    private static boolean isArabicNumbers(String[] arr) throws IOException , NumberFormatException {
+    private static void isValidArabicNumbers(String[] arr) throws IOException , NumberFormatException {
         // Проверяем введённые значения - есть ли арабские цифры и входят ли в допустимый диапазон от 1 до 10
 
-        boolean isArabicNumbers = false;
-        if (Integer.parseInt(arr[0]) > 10 || Integer.parseInt(arr[2]) > 10) {
-            throw new IOException("ОШИБКА! допустимы числа от 1 до 10");
-        } else if (Integer.parseInt(arr[0]) <= 10 || Integer.parseInt(arr[2]) <= 10) {
-            isArabicNumbers = true;
-        }
+        int firstNumber = Integer.parseInt(arr[0]);
+        int secondNumber = Integer.parseInt(arr[2]);
 
-        return isArabicNumbers;
+        if( firstNumber > 10 || firstNumber < 0 || secondNumber > 10 || secondNumber < 0) {
+            throw new IOException("ОШИБКА! допустимы числа от 1 до 10");
+        }
     }
 
-    private static boolean isRomanNumbers(String[] arr) throws IOException {
+    private static void isValidRomanNumbers(String[] arr) throws IOException , IllegalArgumentException {
         // Проверяем введённые значения - есть ли римские цифры и входят ли в допустимый диапазон от 1 до 10
 
-        boolean isRomanNumbers = false;
+        int firstNumber = RomanNumber.romanToArabic(arr[0]);
+        int secondNumber = RomanNumber.romanToArabic(arr[2]);
 
-        String[] arrRoman = new String[RomanNumber.values().length];
-        int i = 0;
-        for (RomanNumber el : RomanNumber.values()){
-            arrRoman[i++] = el.name();
+        if (firstNumber == 0 && secondNumber == 0) {
+            throw new IOException("ОШИБКА! допустимы числа от 1 до 10");
         }
 
-        for (String el : arrRoman) {
-            if( arr[0].equals(el) || arr[2].equals(el) ){
-                isRomanNumbers =  true;
-            }
+        if (firstNumber > 10 || firstNumber < 0 || secondNumber > 10 || secondNumber < 0 ) {
+            throw new IOException("ОШИБКА! допустимы числа от 1 до 10");
         }
-
-        if(isRomanNumbers){
-            int firstNumber = RomanNumber.romanToArabic(arr[0]);
-            int secondNumber = RomanNumber.romanToArabic(arr[2]);
-
-            if(  firstNumber > 10 || firstNumber < 1
-                || secondNumber > 10 || secondNumber < 1 ){
-                throw new IOException("ОШИБКА! допустимы числа от 1 до 10");
-            }
-        }
-
-        return isRomanNumbers;
     }
 
     private static void calculatorArabic(String[] arr) throws IOException {
         // Считаем полученное выражение с арабскими цифрами
+        try {
+            System.out.println(calculate(Integer.parseInt(arr[0]), Integer.parseInt(arr[2]), arr[1]));
+        }catch (NumberFormatException ex){
+            throw new IOException("ОШИБКА! т.к. Введены некорректные данные");
+        }
 
-        System.out.println(calculate(Integer.parseInt(arr[0]) , Integer.parseInt(arr[2]) , arr[1] ));
     }
 
     private static void calculatorRoman(String[] arr) throws IOException {

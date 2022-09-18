@@ -1,5 +1,6 @@
 package ru.newpicker.kata;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public enum RomanNumber {
         this.arabicValue = value;
     }
 
-    static int romanToArabic(String roman){
+    static int romanToArabic(String roman) throws IllegalArgumentException {
 
         String romanNumeral = roman;
         int result = 0;
