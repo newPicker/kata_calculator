@@ -5,27 +5,48 @@ import java.util.Scanner;
 
 public class Main {
 
+    /** Тестовые примеры:
+    5 + 5 -> 10
+    V + V -> 10
+    12 + 12 -> ошибка (от 1 до 10)
+    XV + X -> ошибка (от 1 до 10)
+    V - X -> ошибка (в римской системе нет отрицательных чисел)
+    10 / -> ошибка (строка не является математической операцией)
+    V + -> ошибка (строка не является математической операцией)
+    5 + 5 + 5 -> ошибка (формат математической операции не удовлетворяет заданию)
+    V + V + V -> ошибка (формат математической операции не удовлетворяет заданию)
+    5 + V -> ошибка (используются одновременно разные системы счисления)
+    sdgfv + asf -> ошибка (некорректные данные)
+    2.2 + 5 -> ошибка (некорректные данные)
+    2.2 + V -> ошибка (некорректные данные)
+    I + VIII -> IX
+    V - I -> IV
+    X / IV -> II
+    X / IX -> I
+    II * IV -> VIII
+    II * IX -> XVIII
+    IX * IX -> LXXXI
+    */
+
     public static void main(String[] args) throws IOException {
 
-        String input = getString();
-        isCorrectData(input);
-        String[] arr = input.split(" ");
+    String input = getString();
+    isCorrectData(input);
+    String[] arr = input.split(" ");
 
-        int systemOfOperand1 = systemOfOperand(arr[0]); // 0 - некорректные данные, 1 - араб, 2 - рим
-        int systemOfOperand2 = systemOfOperand(arr[2]); // 0 - некорректные данные, 1 - араб, 2 - рим
+    int systemOfOperand1 = systemOfOperand(arr[0]); // 0 - некорректные данные, 1 - араб, 2 - рим
+    int systemOfOperand2 = systemOfOperand(arr[2]); // 0 - некорректные данные, 1 - араб, 2 - рим
 
-        if(systemOfOperand1 == 2 && systemOfOperand2 == 2) {
-            isValidRomanNumbers(arr);
-            calculatorRoman(arr);
-        } else if (systemOfOperand1 == 1 && systemOfOperand2 == 1) {
-            isValidArabicNumbers(arr);
-            calculatorArabic(arr);
-        } else {
-            throw new IOException("ОШИБКА! т.к. используются одновременно разные системы счисления");
-        }
+    if(systemOfOperand1 == 2 && systemOfOperand2 == 2) {
+        isValidRomanNumbers(arr);
+        calculatorRoman(arr);
+    } else if (systemOfOperand1 == 1 && systemOfOperand2 == 1) {
+        isValidArabicNumbers(arr);
+        calculatorArabic(arr);
+    } else {
+        throw new IOException("ОШИБКА! т.к. используются одновременно разные системы счисления");
+    }
 }
-
-
 
     private static String getString() {
         // Получаем выраженние, которое нужно посчитать
@@ -112,6 +133,7 @@ public class Main {
 
     private static void calculatorArabic(String[] arr) throws IOException {
         // Считаем полученное выражение с арабскими цифрами
+
         try {
             System.out.println(calculate(Integer.parseInt(arr[0]), Integer.parseInt(arr[2]), arr[1]));
         }catch (NumberFormatException ex){
@@ -133,7 +155,7 @@ public class Main {
     }
 
     private static int calculate(int operand1, int operand2, String operand) throws IOException {
-        // Считаем полученное выражение с арабскими цифрами
+        // Основа калькулятора
 
         int result = 0;
 
@@ -152,6 +174,5 @@ public class Main {
         }
         return result;
     }
-
 
 }

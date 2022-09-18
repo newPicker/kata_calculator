@@ -18,41 +18,44 @@ public enum RomanNumber {
         this.arabicValue = value;
     }
 
+    // Метод для перевода римских цифр в числовое значение (арабскими цифрами)
     static int romanToArabic(String roman) throws IllegalArgumentException {
 
-        String romanNumeral = roman;
         int result = 0;
+        int buffsum = 0;
 
-        // создаётся список всех римских чисел, которые объявлены вверху
-        List<RomanNumber> romanNumerals = Arrays.asList(RomanNumber.values());
+        if(roman.length() == 1){
+            return RomanNumber.valueOf(roman).arabicValue;
+        }
 
-        // цикл чтобы пробежаться по всем числам из этого списка
-        int i = 0;
+        int currentNumber;
+        int nextNumber;
 
-        // пока (длинна полученной на входе в метод строки > 0 И i < текущего элемента списка)
-        while ((romanNumeral.length() > 0) && (i < romanNumerals.size())) {
+        for(int i = 0 ; i < roman.length() ; i++){
+            currentNumber = RomanNumber.valueOf(String.valueOf(roman.charAt(i))).arabicValue;
 
-            // в переменную symbol сохраняем текущий элемент списка
-            RomanNumber symbol = romanNumerals.get(i);
-
-            // если ???? от названия текущего элемента списка
-            if (romanNumeral.startsWith(symbol.name())) {
-
-                // в result плюсуем число-значение текущего элемента списка
-                result += symbol.arabicValue;
-
-                // в строку, полученную на входе в метод, сохраняем ????
-                romanNumeral = romanNumeral.substring(symbol.name().length());
-
-                // иначе переходим к следующему элементу списка всех римских чисел
-            } else {
-                i++;
+            // Если дошли до последнего символа, то нужно посчитать сумму
+            if(i == roman.length()-1){
+                result += currentNumber + buffsum;
+                break;
             }
+
+            nextNumber = RomanNumber.valueOf(String.valueOf(roman.charAt(i+1))).arabicValue;
+
+            // Если текущий символ меньше следующего, то нужно вычисть накомленную сумму
+            if ( currentNumber < nextNumber) {
+                result += buffsum - currentNumber;
+                buffsum = 0;
+            }else{ // Иначе накапливаем сумму
+                buffsum += currentNumber;
+            }
+
         }
 
         return result;
     }
 
+    // Метод для перевода арабских цифр в римские
     static String arabicToRoman(int arabic){
 
         // создаётся список всех римских чисел, которые объявлены вверху
@@ -73,7 +76,7 @@ public enum RomanNumber {
             // если (число-значение текущего элемента списка <= полученного на входе в метод число)
             if (currentSymbol.arabicValue <= arabic) {
 
-                // для коробки ???? римское название текущего элемента списка
+                // для коробки добавляется римское название текущего элемента списка
                 sb.append(currentSymbol.name());
 
                 // от полученного на входе в метод числа отнимаем число-значение текущего элемента списка
@@ -85,7 +88,12 @@ public enum RomanNumber {
             }
         }
 
-        return sb.toString();
+        return sb.toString()
+                // Чтоб правильно выводить 4, 9, 40, 90
+                .replace("LXXXX" , "XC")
+                .replace("XXXX", "XL")
+                .replace("VIIII" , "IX")
+                .replace("IIII" , "IV" );
     }
 
 }
